@@ -32,11 +32,11 @@ Respond within 1 business day (even if only to acknowledge).
 
 ([Google's best practices page](https://google.github.io/eng-practices/review/reviewer/looking-for.html))
 
-[B]Design: Is the code well-designed and appropriate for your system?
+**Design: Is the code well-designed and appropriate for your system?**
 
 The most important thing to cover in a review is the overall design of the CL. Do the interactions of various pieces of code in the CL make sense? Does this change belong in your codebase, or in a library? Does it integrate well with the rest of your system? Is now a good time to add this functionality?
 
-Functionality: Does the code behave as the author likely intended? Is the way the code behaves good for its users?
+**Functionality: Does the code behave as the author likely intended? Is the way the code behaves good for its users?**
 
 Does this CL do what the developer intended? Is what the developer intended good for the users of this code? The “users” are usually both end-users (when they are affected by the change) and developers (who will have to “use” this code in the future).
 
@@ -46,13 +46,13 @@ You can validate the CL if you want—the time when it’s most important for a 
 
 Another time when it’s particularly important to think about functionality during a code review is if there is some sort of parallel programming going on in the CL that could theoretically cause deadlocks or race conditions. These sorts of issues are very hard to detect by just running the code and usually need somebody (both the developer and the reviewer) to think through them carefully to be sure that problems aren’t being introduced. (Note that this is also a good reason not to use concurrency models where race conditions or deadlocks are possible—it can make it very complex to do code reviews or understand the code.)
 
-Complexity: Could the code be made simpler? Would another developer be able to easily understand and use this code when they come across it in the future?
+**Complexity: Could the code be made simpler? Would another developer be able to easily understand and use this code when they come across it in the future?**
 
 Is the CL more complex than it should be? Check this at every level of the CL—are individual lines too complex? Are functions too complex? Are classes too complex? “Too complex” usually means “can’t be understood quickly by code readers.” It can also mean “developers are likely to introduce bugs when they try to call or modify this code.”
 
 A particular type of complexity is over-engineering, where developers have made the code more generic than it needs to be, or added functionality that isn’t presently needed by the system. Reviewers should be especially vigilant about over-engineering. Encourage developers to solve the problem they know needs to be solved now, not the problem that the developer speculates might need to be solved in the future. The future problem should be solved once it arrives and you can see its actual shape and requirements in the physical universe.
 
-Tests: Does the code have correct and well-designed automated tests?
+**Tests: Does the code have correct and well-designed automated tests?**
 
 Ask for unit, integration, or end-to-end tests as appropriate for the change. In general, tests should be added in the same CL as the production code unless the CL is handling an emergency.
 
@@ -62,11 +62,11 @@ Will the tests actually fail when the code is broken? If the code changes beneat
 
 Remember that tests are also code that has to be maintained. Don’t accept complexity in tests just because they aren’t part of the main binary.
 
-Naming: Did the developer choose clear names for variables, classes, methods, etc.?
+**Naming: Did the developer choose clear names for variables, classes, methods, etc.?**
 
 Did the developer pick good names for everything? A good name is long enough to fully communicate what the item is or does, without being so long that it becomes hard to read.
 
-Comments: Are the comments clear and useful?
+**Comments: Are the comments clear and useful?**
 
 Did the developer write clear comments in understandable English? Are all of the comments actually necessary? Usually comments are useful when they explain why some code exists, and should not be explaining what some code is doing. If the code isn’t clear enough to explain itself, then the code should be made simpler. There are some exceptions (regular expressions and complex algorithms often benefit greatly from comments that explain what they’re doing, for example) but mostly comments are for information that the code itself can’t possibly contain, like the reasoning behind a decision.
 
@@ -74,7 +74,7 @@ It can also be helpful to look at comments that were there before this CL. Maybe
 
 Note that comments are different from documentation of classes, modules, or functions, which should instead express the purpose of a piece of code, how it should be used, and how it behaves when used.
 
-Style: Does the code follow our style guides?
+**Style: Does the code follow our style guides?**
 
 We have style guides at Google for all of our major languages, and even for most of the minor languages. Make sure the CL follows the appropriate style guides.
 
@@ -82,6 +82,6 @@ If you want to improve some style point that isn’t in the style guide, prefix 
 
 The author of the CL should not include major style changes combined with other changes. It makes it hard to see what is being changed in the CL, makes merges and rollbacks more complex, and causes other problems. For example, if the author wants to reformat the whole file, have them send you just the reformatting as one CL, and then send another CL with their functional changes after that.
 
-Documentation: Did the developer also update relevant documentation?
+**Documentation: Did the developer also update relevant documentation?**
 
 If a CL changes how users build, test, interact with, or release code, check to see that it also updates associated documentation, including READMEs, g3doc pages, and any generated reference docs. If the CL deletes or deprecates code, consider whether the documentation should also be deleted. If documentation is missing, ask for it.
