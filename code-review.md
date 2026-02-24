@@ -28,7 +28,7 @@ We optimize for team throughput, not individual perfection.
 
 Respond within 1 business day (even if only to acknowledge).
 
-## What Do Code Reviewers Look For?
+## What Should Code Reviewers Look For?
 
 (Inspired by Google's best practices page.)
 Design: Is the code well-designed and appropriate for your system?
