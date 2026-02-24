@@ -32,7 +32,7 @@ Respond within 1 business day (even if only to acknowledge).
 
 ([Google's best practices page](https://google.github.io/eng-practices/review/reviewer/looking-for.html))
 
-Design: Is the code well-designed and appropriate for your system?
+[B]Design: Is the code well-designed and appropriate for your system?
 
 The most important thing to cover in a review is the overall design of the CL. Do the interactions of various pieces of code in the CL make sense? Does this change belong in your codebase, or in a library? Does it integrate well with the rest of your system? Is now a good time to add this functionality?
 
