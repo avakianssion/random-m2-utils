@@ -30,7 +30,7 @@ Respond within 1 business day (even if only to acknowledge).
 
 ## What Should Code Reviewers Look For?
 
-(Google's best practices page.[text](https://google.github.io/eng-practices/review/reviewer/looking-for.html))
+([Google's best practices page](https://google.github.io/eng-practices/review/reviewer/looking-for.html))
 
 Design: Is the code well-designed and appropriate for your system?
 
