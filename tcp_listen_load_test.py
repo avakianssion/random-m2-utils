@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 """
 TCP debug listener — measures events/sec and latency from event timestamps.
 """
@@ -12,28 +12,30 @@ from dataclasses import dataclass, field
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-PORTS           = [9001, 9002]         # TCP ports to listen on
-PRINT_INTERVAL  = 3.0                  # seconds between stats printout
-TIMESTAMP_FIELD = "ts"                 # JSON field with unix timestamp (sec or ms)
-RECV_BUFFER     = 1 << 16             # 64KB reads
+PORTS = [9001, 9002]  # TCP ports to listen on
+PRINT_INTERVAL = 3.0  # seconds between stats printout
+TIMESTAMP_FIELD = "ts"  # JSON field with unix timestamp (sec or ms)
+RECV_BUFFER = 1 << 16  # 64KB reads
 
 
 # ── Per-port stats ────────────────────────────────────────────────────────────
 
+
 @dataclass
 class PortStats:
-    events:    int   = 0
-    latencies: list  = field(default_factory=list)   # ms
-    errors:    int   = 0
+    events: int = 0
+    latencies: list = field(default_factory=list)  # ms
+    errors: int = 0
     # snapshot from last print interval
     last_events: int = 0
-    last_time:   float = field(default_factory=time.monotonic)
+    last_time: float = field(default_factory=time.monotonic)
 
 
 stats: dict[int, PortStats] = defaultdict(PortStats)
 
 
 # ── Event parsing ─────────────────────────────────────────────────────────────
+
 
 def parse_events(raw: bytes) -> list[dict]:
     """
@@ -62,14 +64,15 @@ def measure(port: int, events: list[dict]) -> None:
         if raw_ts is None:
             continue
         # Accept seconds or milliseconds automatically
-        if raw_ts > 1e12:          # milliseconds
+        if raw_ts > 1e12:  # milliseconds
             raw_ts /= 1000.0
         latency_ms = (now - raw_ts) * 1000.0
-        if latency_ms >= 0:        # ignore obviously wrong clocks
+        if latency_ms >= 0:  # ignore obviously wrong clocks
             s.latencies.append(latency_ms)
 
 
 # ── Async connection handler ──────────────────────────────────────────────────
+
 
 async def handle_connection(reader: asyncio.StreamReader, port: int) -> None:
     s = stats[port]
@@ -91,18 +94,19 @@ def make_handler(port: int):
         writer.transport.set_write_buffer_limits(0)  # don't buffer writes
         await handle_connection(reader, port)
         writer.close()
+
     return _handler
 
 
 # ── Stats printer ─────────────────────────────────────────────────────────────
 
-RESET  = "\033[0m"
-BOLD   = "\033[1m"
-CYAN   = "\033[36m"
-GREEN  = "\033[32m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
+CYAN = "\033[36m"
+GREEN = "\033[32m"
 YELLOW = "\033[33m"
-RED    = "\033[31m"
-DIM    = "\033[2m"
+RED = "\033[31m"
+DIM = "\033[2m"
 
 
 def percentile(data: list[float], p: float) -> float:
@@ -124,42 +128,49 @@ async def print_loop(interval: float, ports: list[int]) -> None:
 
         for port in ports:
             s = stats[port]
-            elapsed   = now - s.last_time
+            elapsed = now - s.last_time
             new_events = s.events - s.last_events
-            eps        = new_events / elapsed if elapsed > 0 else 0.0
+            eps = new_events / elapsed if elapsed > 0 else 0.0
 
             lats = s.latencies
-            avg  = sum(lats) / len(lats) if lats else 0.0
-            p50  = percentile(lats, 50)
-            p99  = percentile(lats, 99)
+            avg = sum(lats) / len(lats) if lats else 0.0
+            p50 = percentile(lats, 50)
+            p99 = percentile(lats, 99)
 
             # Color eps by rough threshold
             eps_color = GREEN if eps > 100 else YELLOW if eps > 0 else DIM
 
             print(f"  {CYAN}:{port}{RESET}")
-            print(f"    events/sec  {eps_color}{eps:>10,.1f}{RESET}   "
-                  f"(total {s.events:,})")
+            print(
+                f"    events/sec  {eps_color}{eps:>10,.1f}{RESET}   "
+                f"(total {s.events:,})"
+            )
 
             if lats:
                 lat_color = GREEN if avg < 50 else YELLOW if avg < 500 else RED
-                print(f"    latency ms  {lat_color}avg {avg:>7.1f}  "
-                      f"p50 {p50:>7.1f}  p99 {p99:>7.1f}{RESET}")
+                print(
+                    f"    latency ms  {lat_color}avg {avg:>7.1f}  "
+                    f"p50 {p50:>7.1f}  p99 {p99:>7.1f}{RESET}"
+                )
             else:
-                print(f"    latency     {DIM}no timestamp field '{TIMESTAMP_FIELD}' found{RESET}")
+                print(
+                    f"    latency     {DIM}no timestamp field '{TIMESTAMP_FIELD}' found{RESET}"
+                )
 
             if s.errors:
                 print(f"    {RED}errors      {s.errors}{RESET}")
 
             # Reset for next window
             s.last_events = s.events
-            s.last_time   = now
-            s.latencies   = []
+            s.last_time = now
+            s.latencies = []
 
         print(f"{DIM}{'─' * 56}{RESET}", flush=True)
         await asyncio.sleep(interval)
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 async def main():
     servers = []
@@ -168,8 +179,10 @@ async def main():
         servers.append(server)
         print(f"  {GREEN}listening{RESET} on :{port}")
 
-    print(f"  {DIM}printing every {PRINT_INTERVAL}s  |  "
-          f"timestamp field: '{TIMESTAMP_FIELD}'{RESET}\n")
+    print(
+        f"  {DIM}printing every {PRINT_INTERVAL}s  |  "
+        f"timestamp field: '{TIMESTAMP_FIELD}'{RESET}\n"
+    )
 
     async with asyncio.TaskGroup() as tg:
         for server in servers:
